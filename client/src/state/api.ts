@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
-import { access } from "fs";
 
 export interface Project {
   id: number;
@@ -80,7 +79,7 @@ export const api = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
     prepareHeaders: async (headers) => {
       const session = await fetchAuthSession();
-      const accessToken = session.tokens ?? {};
+      const { accessToken } = session.tokens ?? {};
       if (accessToken) {
         headers.set("Authorization", `Bearer ${accessToken}`);
       }
@@ -95,7 +94,7 @@ export const api = createApi({
         try {
           const user = await getCurrentUser();
           const session = await fetchAuthSession();
-          if (!session) throw new Error("Session not found");
+          if (!session) throw new Error("No session found");
           const { userSub } = session;
           const { accessToken } = session.tokens ?? {};
 
@@ -104,7 +103,7 @@ export const api = createApi({
 
           return { data: { user, userSub, userDetails } };
         } catch (error: any) {
-          return { error: error.message || "Could not fetch user data." };
+          return { error: error.message || "Could not fetch user data" };
         }
       },
     }),
